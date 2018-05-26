@@ -7,42 +7,31 @@ from talib import abstract
 from config import *
 
 # Initiate our application
-def __init__():
-  # Set variables
-  instrument = "GBP_JPY"
+def main():
+  # Set instrument
+  instrument = "EUR_USD"
 
-  # Get last ten candles and assign variable
-  last_ten_candles = get_last_N_candles(instrument, 10)
+  # Last candles
+  last_ten = get_last_N_candles(instrument, 10)
 
-  last_fourteen_candles = get_last_N_candles(instrument, 14)
+  last_five = get_last_N_candles(instrument, 5)
 
-  # Get OHLCV of last ten candles and assign variable
-  OHLCV10 = get_OHLCV(last_ten_candles)
+  # OHLCVs
+  OHLCV10 = get_OHLCV(last_ten)
 
-  # Get hourly EMA10 and assign
-  H1_EMA10 = get_H1_EMA10(OHLCV10)
+  OHLCV5 = get_OHLCV(last_five)
+
+  # EMAs
+  H1_EMA10 = get_EMA(OHLCV10, 10)
+
+  H1_EMA5 = get_EMA(OHLCV5, 5)
+
+  print('H1_EMA10: ' + str(H1_EMA10))
+  print('H1_EMA5: ' + str(H1_EMA5))
 
 
 
-  # getEMATen(last_ten_candles)
-
-# HTTP request to Oanda API to get last ten candles
-# def get_last_ten(instrument):
-
-#   # Must provide authorization for permission
-#   headers = {"Authorization": "Bearer {}".format(access_token)}
-
-#   # Paramaters to pass to API
-#   params = {
-#     'granularity': 'H1',
-#     'count': '10'
-#   }
-
-#   # Send request and store json response
-#   last_ten_candles = requests.get(API_URL + '/v3/instruments/' + instrument + '/candles', headers = headers, params = params).json()['candles']
-#   print last_ten_candles
-#   return last_ten_candles
-
+# HTTP request to Oanda API to get last N candles
 def get_last_N_candles(instrument, n):
   # Must provide authorization for permission
   headers = {"Authorization": "Bearer {}".format(access_token)}
@@ -80,9 +69,10 @@ def get_OHLCV(last_N_candles):
 
   return OHLCV
 
-def get_H1_EMA10(OHLCV):
-  EMA10 = abstract.EMA(OHLCV, timeperiod=10)
-  print(EMA10)
+# Ta-lib
+def get_EMA(OHLCV, timeperiod):
+  EMA = abstract.EMA(OHLCV, timeperiod = timeperiod)[-1]
+  return EMA
 
 
 
@@ -91,7 +81,7 @@ def get_H1_EMA10(OHLCV):
 
 
 # Fire up
-__init__()
+main()
 
 
 ################################################# DEPRECATED ##########################################################

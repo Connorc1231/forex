@@ -3,7 +3,7 @@ To execute, run the following command:
 
 python streaming.py [options]
 
-To show heartbeat, replace [options] by -b or --displayHeartBeat
+To show heartbeat, -b or --displayHeartBeat
 """
 
 import requests
