@@ -21,16 +21,6 @@ def main():
 
   OHLCV5 = get_OHLCV(last_five)
 
-  # EMAs
-  H1_EMA10 = get_EMA(OHLCV10, 10)
-
-  H1_EMA5 = get_EMA(OHLCV5, 5)
-
-  print('H1_EMA10: ' + str(H1_EMA10))
-  print('H1_EMA5: ' + str(H1_EMA5))
-
-
-
 # HTTP request to Oanda API to get last N candles
 def get_last_N_candles(instrument, n):
   # Must provide authorization for permission
@@ -69,18 +59,6 @@ def get_OHLCV(last_N_candles):
 
   return OHLCV
 
-# Ta-lib
-def get_EMA(OHLCV, timeperiod):
-  EMA = abstract.EMA(OHLCV, timeperiod = timeperiod)[-1]
-  return EMA
-
-
-
-
-
-
-
-# Fire up
 if __name__ == "__main__":
   main()
 
