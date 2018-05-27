@@ -26,7 +26,7 @@ def connect_to_stream():
     }
 
   # Set variables
-  environment = "demo" # Specify live or demo environment
+  environment = 'demo' # Specify live or demo environment
   instruments = 'EUR_USD' # Desired instrument
   domain = domainDict[environment] 
 
@@ -61,7 +61,7 @@ def stream(displayHeartbeat):
         print("Caught exception when converting message into json: " + str(e))
         return
 
-      if "instrument" in msg or "tick" in msg or displayHeartbeat:
+      if 'instrument' in msg or 'tick' in msg or displayHeartbeat:
         if 'bids' in line:
           line = parse_line(msg)
         print(line)
