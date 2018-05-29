@@ -1,7 +1,7 @@
 def getSMA(closes):
   _sum = sum(closes)
   n = len(closes)
-  SMA = _sum / n
+  SMA = round(_sum / n, 4)
   return SMA
 
 def getMultiplier(n):
@@ -9,7 +9,7 @@ def getMultiplier(n):
 
 # prevEMA = SMA for first calculation of EMA
 # EMA gets accurate over time, first calc using SMA way off...
-def getEMA(currentPrice, prevEMA, mult):
+def calcEMA(currentPrice, prevEMA, mult):
   EMA = (currentPrice - prevEMA) * mult + prevEMA
   return EMA
   
@@ -26,27 +26,40 @@ def getAvgGainLoss(closes):
     if index == 0:
       pass
     else:
-      print(index)
+      # price = closes[index]
       diff = price - closes[index - 1]
       diff = round(diff, 4)
       if diff > 0:
-        avgGainLoss['gain'] += diff
+        avgGainLoss['gain'] += (diff / 14)
       if diff < 0:
-        avgGainLoss['loss'] += abs(diff)
-
+        avgGainLoss['loss'] += abs(diff / 14)
   return avgGainLoss
 
+# RS
 
-# # RS
-# firstRS = avgGain / avgLoss
-# smoothedRS = [((n - 1) * prevAvgGain + currGain) / n] / [((n - 1) * prevAvgLoss + currLoss) / n]
-def getRS(avgGainLoss):
-  print avgGainLoss
+def calcFirstRS(avgGainLoss):
   firstRS = (avgGainLoss['gain'] / avgGainLoss['loss'])
   return firstRS
 
 
+def calcSmoothedRS(currGainLoss, prevAvgGainLoss):
+  n = 14
+  currGain = currLoss = 0
+  if currGainLoss > 0:
+    currGain = currGainLoss
+  else: 
+    currLoss = abs(currGainLoss)
+
+  # print('GAIN: ' + str(prevAvgGainLoss['gain']) + ' * 13 + ' + str(currGain) + '/ 14'  )
+  # print('LOSS: ' + str(prevAvgGainLoss['loss']) + ' * 13 + ' + str(currLoss) + '/ 14'  )
+  newAvgGain = (prevAvgGainLoss['gain'] * 13 + currGain) / 14 
+  newAvgLoss = (prevAvgGainLoss['loss'] * 13 + currLoss) / 14
+  print(newAvgGain, newAvgLoss)
+  smoothedRS = newAvgGain / newAvgLoss
+  return smoothedRS
+
+
 # # RSI
 # 100 - (100 / (1 + RS))
-def getRSI(RS):
-  return (100 - (100 / (1 + .5702)))
+def calcRSI(RS):
+  return (100 - (100 / (1 + RS)))
