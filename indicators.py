@@ -28,33 +28,30 @@ def getAvgGainLoss(closes):
     else:
       # price = closes[index]
       diff = price - closes[index - 1]
-      diff = round(diff, 4)
       if diff > 0:
-        avgGainLoss['gain'] += (diff / 14)
+        avgGainLoss['gain'] += round(diff / 14, 4)
       if diff < 0:
-        avgGainLoss['loss'] += abs(diff / 14)
+        avgGainLoss['loss'] += round(abs(diff / 14), 4)
   return avgGainLoss
 
 # RS
 
 def calcFirstRS(avgGainLoss):
-  firstRS = (avgGainLoss['gain'] / avgGainLoss['loss'])
+  firstRS = avgGainLoss['gain'] / avgGainLoss['loss']
   return firstRS
 
 
 def calcSmoothedRS(currGainLoss, prevAvgGainLoss):
   n = 14
-  currGain = currLoss = 0
+  currGain = 0
+  currLoss = 0
   if currGainLoss > 0:
     currGain = currGainLoss
   else: 
     currLoss = abs(currGainLoss)
 
-  # print('GAIN: ' + str(prevAvgGainLoss['gain']) + ' * 13 + ' + str(currGain) + '/ 14'  )
-  # print('LOSS: ' + str(prevAvgGainLoss['loss']) + ' * 13 + ' + str(currLoss) + '/ 14'  )
   newAvgGain = (prevAvgGainLoss['gain'] * 13 + currGain) / 14 
   newAvgLoss = (prevAvgGainLoss['loss'] * 13 + currLoss) / 14
-  print(newAvgGain, newAvgLoss)
   smoothedRS = newAvgGain / newAvgLoss
   return smoothedRS
 
