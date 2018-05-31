@@ -10,27 +10,38 @@ from indicators import *
 def main():
   instrument = 'EUR_USD'
   # RSI requires one inital datapoint BEFORE its timeperiod, n = 15 for RSI14
-  n =500 
-  candles = get_last_N_candles(instrument, n)
-  OHLCV = get_OHLCV(candles)
-  closes = OHLCV['close']
+  # n =500 
+  # candles = get_last_N_candles(instrument, n)
+  # OHLCV = get_OHLCV(candles)
+  # closes = OHLCV['close']
+
+
+  closes14 = get_OHLCV(get_last_N_candles(instrument, 14))['close']
 
   #### GET SMA ####
-  SMA = getSMA(closes)
-  # print(SMA)
+  SMA = calcSMA(closes14)
 
   #### GET EMA ####
-  EMAs = getEMA(closes)
+  EMAList = getEMA(closes14)
+  currentEMA = EMAList[-1]
 
   #### GET RSI ####
-  RSIs = getRSI(closes)
+  closes250 = get_OHLCV(get_last_N_candles(instrument, 250))['close']
+  RSIList = getRSI(closes250)
+  currentRSI = RSIList[-1]
 
-  #### GET RSI #####
-  # avgGainLoss = getAvgGainLoss(closes)
-  # RS = getRS(avgGainLoss)
-  # print(RS)
-  # RSI = getRSI(RS)
-  # print(RSI)
+  #### GET STOCH ####
+  stochList = getStoch(closes250)
+  currentStoch = stochList[-1]
+
+  indicators = {
+    'SMA': SMA,
+    'EMA': currentEMA,
+    'RSI': currentRSI,
+    "Stoch": currentStoch
+  }
+
+  print(indicators)
 
 def getEMA(closes):
   EMAs = []
@@ -40,7 +51,7 @@ def getEMA(closes):
       break
     else:
       if index == 0:
-        firstSMA = getSMA(closes[0 : 10])
+        firstSMA = calcSMA(closes[0 : 10])
         EMAs.append(firstSMA)
       else:
         prevEMA = EMAs[-1]
@@ -51,7 +62,6 @@ def getEMA(closes):
 def getRSI(closes):
   RSIs = []
   prevAvgGainLoss = getAvgGainLoss(closes[0 : 15])
-  print(prevAvgGainLoss)
   for index, price in enumerate(closes):
     if index == len(closes) - 14:
       break
@@ -64,7 +74,6 @@ def getRSI(closes):
         currGainLoss = closes[index + 14] - closes[index + 13]
         smoothedRS = calcSmoothedRS(currGainLoss, prevAvgGainLoss)
 
-        # Trouble correctly updating prevAvgGainLoss correctly
         if currGainLoss > 0:
           prevAvgGainLoss['gain'] = (prevAvgGainLoss['gain'] * 13 + currGainLoss) / 14
           prevAvgGainLoss['loss'] = (prevAvgGainLoss['loss'] * 13) / 14
@@ -72,11 +81,29 @@ def getRSI(closes):
           prevAvgGainLoss['gain'] = (prevAvgGainLoss['gain'] * 13) / 14 
           prevAvgGainLoss['loss'] = (prevAvgGainLoss['loss'] * 13 + abs(currGainLoss)) / 14
         RSI = calcRSI(smoothedRS)
+        RSI = round(RSI, 4)
         RSIs.append(RSI)
-
-  print(RSIs)
   return RSIs
 
+def getStoch(closes):
+  kList = []
+  for index, price in enumerate(closes):
+    closeChunk = closes[index : index + 14]
+    if index == len(closes) - 13:
+      break
+    else:
+      kVal = calcK(closeChunk)
+      kList.append(kVal)
+  
+  smoothedKList = []
+  for index, price in enumerate(kList):
+    kChunk = kList[index : index + 3]
+    if index == len(kList) - 2:
+      break
+    else:
+      smoothK = calcSMA(kChunk)
+      smoothedKList.append(smoothK)
+  return smoothedKList
 
 if __name__ == "__main__":
   main()

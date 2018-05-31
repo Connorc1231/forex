@@ -1,4 +1,4 @@
-def getSMA(closes):
+def calcSMA(closes):
   _sum = sum(closes)
   n = len(closes)
   SMA = round(_sum / n, 4)
@@ -60,3 +60,20 @@ def calcSmoothedRS(currGainLoss, prevAvgGainLoss):
 # 100 - (100 / (1 + RS))
 def calcRSI(RS):
   return (100 - (100 / (1 + RS)))
+
+'''
+%K = (Current Close - Lowest Low)/(Highest High - Lowest Low) * 100
+%D = 3-day SMA of %K
+
+Lowest Low = lowest low for the look-back period
+Highest High = highest high for the look-back period
+%K is multiplied by 100 to move the decimal point two places
+'''
+
+# %K = (Current Close - Lowest Low)/(Highest High - Lowest Low) * 100
+def calcK(closes):
+  currClose = round(closes[-1], 4)
+  lowestLow = round(min(closes), 4)
+  highestHigh = round(max(closes), 4)
+  kVal = (currClose - lowestLow) / (highestHigh - lowestLow) * 100
+  return kVal
