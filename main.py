@@ -9,14 +9,11 @@ from indicators import *
 
 def main():
   instrument = 'EUR_USD'
-  # RSI requires one inital datapoint BEFORE its timeperiod, n = 15 for RSI14
-  # n =500 
-  # candles = get_last_N_candles(instrument, n)
-  # OHLCV = get_OHLCV(candles)
-  # closes = OHLCV['close']
+  bigDataCloses = get_OHLCV(get_last_N_candles(instrument, 250))['close']
 
-
-  closes14 = get_OHLCV(get_last_N_candles(instrument, 14))['close']
+  closes14 = bigDataCloses[0 : 15]
+  closes40 = bigDataCloses[0 : 41]
+  closes250 = bigDataCloses
 
   #### GET SMA ####
   SMA = calcSMA(closes14)
@@ -25,8 +22,9 @@ def main():
   EMAList = getEMA(closes14)
   currentEMA = EMAList[-1]
 
-  #### GET RSI ####
   closes250 = get_OHLCV(get_last_N_candles(instrument, 250))['close']
+
+  #### GET RSI ####
   RSIList = getRSI(closes250)
   currentRSI = RSIList[-1]
 
@@ -34,14 +32,25 @@ def main():
   stochList = getStoch(closes250)
   currentStoch = stochList[-1]
 
+  closes40 = get_OHLCV(get_last_N_candles(instrument, 40))['close']
+  #### GET BBANDS ####
+  BBands = getBBands(closes40)
+  currentBBands = {
+    'upper': BBands['upper'][-1],
+    'mid': BBands['mid'][-1],
+    'lower': BBands['lower'][-1]
+  }
+
   indicators = {
     'SMA': SMA,
     'EMA': currentEMA,
     'RSI': currentRSI,
-    "Stoch": currentStoch
+    "Stoch": currentStoch,
+    "BBands": currentBBands
   }
 
   print(indicators)
+  return indicators
 
 def getEMA(closes):
   EMAs = []
@@ -104,6 +113,28 @@ def getStoch(closes):
       smoothK = calcSMA(kChunk)
       smoothedKList.append(smoothK)
   return smoothedKList
+
+def getBBands(closes):
+  BBandDict = {
+    'upper': [],
+    'mid': [],
+    'lower': []
+  }
+  for index, price in enumerate(closes):
+    closeChunk = closes[index : index + 21]
+    if index == len(closes) - 20:
+      break
+    else: 
+      sma = calcSMA(closeChunk)
+      standardDev = calcStandardDev(closeChunk)
+      upper = round(sma + (2 * standardDev), 4)
+      lower = round(sma - (2 * standardDev), 4)
+
+      BBandDict['upper'].append(upper)
+      BBandDict['mid'].append(sma)
+      BBandDict['lower'].append(lower)
+
+  return BBandDict
 
 if __name__ == "__main__":
   main()

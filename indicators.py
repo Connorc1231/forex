@@ -35,7 +35,6 @@ def getAvgGainLoss(closes):
   return avgGainLoss
 
 # RS
-
 def calcFirstRS(avgGainLoss):
   firstRS = avgGainLoss['gain'] / avgGainLoss['loss']
   return firstRS
@@ -77,3 +76,15 @@ def calcK(closes):
   highestHigh = round(max(closes), 4)
   kVal = (currClose - lowestLow) / (highestHigh - lowestLow) * 100
   return kVal
+
+# sqrt[ (1/N) * Sigma i = 1 to N of (x - mu)^2 ]
+def calcStandardDev(closes):
+  mu = calcSMA(closes)
+  sigmaResult = 0
+  for price in closes:
+    sigmaResult += (price - mu) ** 2
+
+  standardDev = (float(1) / len(closes) * sigmaResult) ** 0.5
+  return standardDev
+
+
