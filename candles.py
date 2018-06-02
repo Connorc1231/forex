@@ -1,9 +1,7 @@
 import json
 import requests
-import talib
 import numpy as np
 
-from talib import abstract
 from config import *
 
 # Initiate our application
@@ -147,14 +145,3 @@ if __name__ == "__main__":
 # r = trades.TradesList(ACCOUNT_ID)
 # rv = client.request(r)
 # print("RESPONSE:\n{}".format(json.dumps(rv, indent=2)))
-
-
-
-
-
-
-# Exhange Rate
-# EMA5
-# EMA10
-# Stochm
-# RSI

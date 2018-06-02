@@ -1,6 +1,8 @@
 from candles import *
 from indicators import *
 
+from talib import abstract
+
 # NOTE
 # RSI and EMA are smoothed, meaning they depend on previous values of themselves
 # Currently using static data, can only get first point of RSI / EMA
@@ -11,28 +13,26 @@ def main():
   instrument = 'EUR_USD'
   bigDataCloses = get_OHLCV(get_last_N_candles(instrument, 250))['close']
 
-  closes14 = bigDataCloses[0 : 15]
-  closes40 = bigDataCloses[0 : 41]
-  closes250 = bigDataCloses
+  closes10 = bigDataCloses[len(bigDataCloses) - 10 : len(bigDataCloses)]
+  closes40 = bigDataCloses[len(bigDataCloses) - 40 : len(bigDataCloses)]
+  closes250 = bigDataCloses[len(bigDataCloses) - 250 : len(bigDataCloses)]
 
   #### GET SMA ####
-  SMA = calcSMA(closes14)
+  SMA = calcSMA(closes10)
 
-  #### GET EMA ####
-  EMAList = getEMA(closes14)
+  ### GET EMA ####
+  EMAList = getEMA(closes40)
   currentEMA = EMAList[-1]
-
-  closes250 = get_OHLCV(get_last_N_candles(instrument, 250))['close']
 
   #### GET RSI ####
   RSIList = getRSI(closes250)
   currentRSI = RSIList[-1]
 
+  # Slightly off
   #### GET STOCH ####
   stochList = getStoch(closes250)
   currentStoch = stochList[-1]
 
-  closes40 = get_OHLCV(get_last_N_candles(instrument, 40))['close']
   #### GET BBANDS ####
   BBands = getBBands(closes40)
   currentBBands = {
@@ -66,7 +66,7 @@ def getEMA(closes):
         prevEMA = EMAs[-1]
         currEMA = calcEMA(closes[index + 9], prevEMA, getMultiplier(10))
         EMAs.append(currEMA)
-    return EMAs
+  return EMAs
 
 def getRSI(closes):
   RSIs = []
@@ -90,7 +90,7 @@ def getRSI(closes):
           prevAvgGainLoss['gain'] = (prevAvgGainLoss['gain'] * 13) / 14 
           prevAvgGainLoss['loss'] = (prevAvgGainLoss['loss'] * 13 + abs(currGainLoss)) / 14
         RSI = calcRSI(smoothedRS)
-        RSI = round(RSI, 4)
+        RSI = round(RSI, 5)
         RSIs.append(RSI)
   return RSIs
 
@@ -127,8 +127,8 @@ def getBBands(closes):
     else: 
       sma = calcSMA(closeChunk)
       standardDev = calcStandardDev(closeChunk)
-      upper = round(sma + (2 * standardDev), 4)
-      lower = round(sma - (2 * standardDev), 4)
+      upper = round(sma + (2 * standardDev), 5)
+      lower = round(sma - (2 * standardDev), 5)
 
       BBandDict['upper'].append(upper)
       BBandDict['mid'].append(sma)
