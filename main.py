@@ -3,12 +3,6 @@ from indicators import *
 
 from talib import abstract
 
-# NOTE
-# RSI and EMA are smoothed, meaning they depend on previous values of themselves
-# Currently using static data, can only get first point of RSI / EMA
-# Once implement stream and real-time, can store RSI / EMA in db and use for smoothing
-
-
 def main():
   instrument = 'EUR_USD'
   bigDataCloses = get_OHLCV(get_last_N_candles(instrument, 250))['close']
@@ -49,8 +43,12 @@ def main():
     "BBands": currentBBands
   }
 
-  print(indicators)
   return indicators
+
+def writeToFile(indicators):
+  with open('indicators.txt', 'a') as file:
+    file.write(str(indicators))
+    file.write('\n')
 
 def getEMA(closes):
   EMAs = []

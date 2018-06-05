@@ -64,6 +64,7 @@ def stream(displayHeartbeat):
       if 'instrument' in msg or 'tick' in msg or displayHeartbeat:
         if 'bids' in line:
           line = parse_line(msg)
+        print(line)
 
 def parse_line(line):
   output = {
